@@ -1,6 +1,6 @@
 {
   "name": "lorano",
-  "description": "High-level LoRa communications library",
+  "description": "Compact and opinionated LoRa communications library",
   "version": "0.0.1",
   "homepage": "https://github.com/davedoesdev/lorano",
   "author": {
@@ -32,8 +32,7 @@
     "awaitify-stream": "^1.0.1",
     "knex": "^0.14.4",
     "lora-packet": "^0.7.5",
-    "objection": "^1.0.1",
-    "sqlite3": "^4.0.0"
+    "objection": "^1.0.1"
   },
   "devDependencies": {
     "grunt": "~1.0.2",
@@ -47,6 +46,8 @@
     "babel-eslint": "~8.2.2",
     "documentation": "~6.1.0",
     "coveralls": "~3.0.0",
-    "yargs": "^11.0.0"
+    "yargs": "^11.0.0",
+    "sqlite3": "^4.0.0",
+    "lora-comms": "~0.0.3"
   }
 }
