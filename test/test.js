@@ -1,8 +1,8 @@
 "use strict";
 
-// Tested with a SODAQ ExpLoRer running ./lorano_test.ino
+// Tested with a SODAQ ExpLoRer running ./lorano_test_abp.ino
 
-const { LoRaNo } = require('..'),
+const Link = require('..'),
       lora_comms = require('lora-comms'),
       aw = require('awaitify-stream'),
       { Model } = require('objection'),
@@ -26,13 +26,15 @@ before(function ()
     TestModel.knex(knex);
 });
 
-function start()
+function start(cb)
 {
     lora_comms.start_logging();
     lora_comms.log_info.pipe(process.stdout);
     lora_comms.log_error.pipe(process.stderr);
     lora_comms.start();
-    link = new LoRaNo(TestModel, lora_comms.uplink, lora_comms.downlink).link;
+    link = new Link(TestModel, lora_comms.uplink, lora_comms.downlink);
+    link.on('ready', cb);
+    link.on('error', cb);
 }
 
 function stop(cb)
@@ -63,12 +65,14 @@ beforeEach(start);
 afterEach(stop);
 afterEach(wait_for_logs);
 
-describe('echoing device with OTAA', function ()
+describe('echoing device with ABP', function ()
 {
     this.timeout(60 * 60 * 1000);
 
     it('should receive same data sent', async function ()
     {
+        let duplex = aw.createDuplexer(link);
+        console.log(await duplex.readAsync());
 
     });
 });

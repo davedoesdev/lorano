@@ -1,6 +1,6 @@
 
-exports.up = knex => {
-    return knex.schema
+exports.up = async knex => {
+    await knex.schema
         .createTable('SessionKeys', table => {
             table.binary('DevAddr', 4).primary();
             table.binary('NwkSKey', 16);
@@ -8,7 +8,7 @@ exports.up = knex => {
         });
 };
 
-exports.down = knex => {
-    return knex.schema
+exports.down = async knex => {
+    await knex.schema
         .dropTableIfExists('SessionKeys');
 };

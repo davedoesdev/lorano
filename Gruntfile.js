@@ -16,6 +16,11 @@ module.exports = function (grunt)
         },
 
         exec: {
+            seed: {
+                cwd: './test',
+                cmd: '../node_modules/.bin/knex seed:run'
+            },
+
             cover: {
                 cmd: "./node_modules/.bin/nyc -x Gruntfile.js -x 'test/**' node ./node_modules/.bin/grunt test"
             },
@@ -55,7 +60,9 @@ module.exports = function (grunt)
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('lint', 'eslint');
-    grunt.registerTask('test', ['copy:db', 'mochaTest']);
+    grunt.registerTask('test', ['copy:db',
+                                'exec:seed',
+                                'mochaTest']);
     grunt.registerTask('coverage', ['exec:cover',
                                     'exec:cover_report',
                                     'exec:cover_check']);
