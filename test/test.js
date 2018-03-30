@@ -8,7 +8,8 @@ const Link = require('..'),
       { Model } = require('objection'),
       Knex = require('knex'),
       expect = require('chai').expect,
-      path = require('path');
+      path = require('path'),
+      crypto = require('crypto');
 
 let link, TestModel;
 
@@ -71,8 +72,38 @@ describe('echoing device with ABP', function ()
 
     it('should receive same data sent', async function ()
     {
+        const payload_size = 12;
         let duplex = aw.createDuplexer(link);
-        console.log(await duplex.readAsync());
+        let send_payload = crypto.randomBytes(payload_size);
 
+        while (true)
+        {
+            let recv_data = await duplex.readAsync();
+            if (recv_data.payload.length !== payload_size)
+            {
+                continue;
+            }
+
+            if (recv_data.payload.equals(send_payload))
+            {
+                // Shouldn't happen because send on reverse polarity
+                console.error('Received packet we sent');
+                continue;
+            }
+
+            if (recv_data.payload.compare(send_payload,
+                                          payload_size/2,
+                                          payload_size,
+                                          payload_size/2,
+                                          payload_size) === 0)
+            {
+                return;
+            }
+
+            send_payload = Buffer.concat([recv_data.payload.slice(0, payload_size/2),
+                                          crypto.randomBytes(payload_size/2)]);
+            recv_data.reply.payload = send_payload;
+            await(duplex.writeAsync(recv_data.reply));
+        }
     });
 });
