@@ -42,16 +42,21 @@ void setup()
   //Use the Hardware EUI
   LoRaBee.getHWEUI(DevEUI, sizeof(DevEUI));
 
-   // Print the Hardware EUI
-  debugSerial.print("LoRa HWEUI: ");
-  for (uint8_t i = 0; i < sizeof(DevEUI); i++) {
-    debugSerial.print((char)NIBBLE_TO_HEX_CHAR(HIGH_NIBBLE(DevEUI[i])));
-    debugSerial.print((char)NIBBLE_TO_HEX_CHAR(LOW_NIBBLE(DevEUI[i])));
-  }
-  debugSerial.println(); 
-    
-  while (!LoRaBee.initOTA(loraSerial, DevEUI, AppEUI, AppKey, false))
+  while (true)
   {
+    // Print the Hardware EUI
+    debugSerial.print("LoRa HWEUI: ");
+    for (uint8_t i = 0; i < sizeof(DevEUI); i++) {
+      debugSerial.print((char)NIBBLE_TO_HEX_CHAR(HIGH_NIBBLE(DevEUI[i])));
+      debugSerial.print((char)NIBBLE_TO_HEX_CHAR(LOW_NIBBLE(DevEUI[i])));
+    }
+    debugSerial.println(); 
+
+    if (LoRaBee.initOTA(loraSerial, DevEUI, AppEUI, AppKey, false))
+    {
+      break;
+    }
+    
     debugSerial.println("Connection to the network failed!");
     delay(60000);
   }
