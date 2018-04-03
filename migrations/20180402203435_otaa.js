@@ -11,6 +11,7 @@ exports.up = async knex => {
         .createTable('OTAAHistory', table => {
             table.binary('DevEUI', 8);
             table.binary('DevNonce', 2);
+            table.datetime('UsedAt').defaultTo(knex.fn.now());
             table.primary(['DevEUI', 'DevNonce']);
         });
 };
