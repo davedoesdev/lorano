@@ -1,5 +1,14 @@
 "use strict";
 
+let args = '';
+for (const arg of process.argv)
+{
+    if (arg.startsWith('--'))
+    {
+        args += ' ' + arg;
+    }
+}
+
 module.exports = function (grunt)
 {
     grunt.initConfig(
@@ -18,7 +27,7 @@ module.exports = function (grunt)
         exec: {
             seed: {
                 cwd: './test',
-                cmd: '../node_modules/.bin/knex seed:run'
+                cmd: '../node_modules/.bin/knex seed:run --' + args
             },
 
             cover: {
