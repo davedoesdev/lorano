@@ -33,7 +33,12 @@ function start(cb)
     lora_comms.log_info.pipe(process.stdout);
     lora_comms.log_error.pipe(process.stderr);
     lora_comms.start();
-    link = new Link(TestModel, lora_comms.uplink, lora_comms.downlink);
+    link = new Link(TestModel, lora_comms.uplink, lora_comms.downlink,
+    {
+        // USE YOUR OWN IDS!
+        appid: Buffer.alloc(8),
+        netid: Buffer.from([0x00, 0x00, 0x00]) // 7 lsb = NwkId
+    });
     link.on('ready', cb);
     link.on('error', cb);
 }
