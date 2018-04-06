@@ -1,4 +1,5 @@
-const i = process.argv.indexOf('--'),
+const crypto = require('crypto'),
+      i = process.argv.indexOf('--'),
       argv = require('yargs')(i < 0 ? process.argv : process.argv.slice(i + 1))
             .option('deveui', {
                 type: 'string',
@@ -13,12 +14,12 @@ const i = process.argv.indexOf('--'),
             .argv;
 
 exports.seed = async knex => {
-    await knex('OTAAKeys').del();
-    await knex('OTAAKeys').insert(
+    await knex('OTAASessions').del();
+    await knex('OTAASessions').insert(
     {
+        NwkAddr: crypto.randomBytes(4),
         DevEUI: argv.deveui,
         AppKey: argv.appkey
     });
     await knex('OTAAHistory').del();
-    await knex('OTAAsessions').del();
 };
