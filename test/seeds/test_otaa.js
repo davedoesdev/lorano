@@ -15,9 +15,11 @@ const crypto = require('crypto'),
 
 exports.seed = async knex => {
     await knex('OTAASessions').del();
+    let nwk_addr = crypto.randomBytes(4);
+    nwk_addr[0] &= 0x01;
     await knex('OTAASessions').insert(
     {
-        NwkAddr: crypto.randomBytes(4),
+        NwkAddr: nwk_addr,
         DevEUI: argv.deveui,
         AppKey: argv.appkey
     });

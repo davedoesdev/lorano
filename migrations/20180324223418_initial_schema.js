@@ -2,8 +2,7 @@ exports.up = async knex => {
     await knex.schema
         .createTable('ABPSessions', table => {
             table.binary('DevAddr', 4)
-                 .primary()
-                 .notNullable();
+                 .primary();
             table.binary('NwkSKey', 16)
                  .notNullable();
             table.binary('AppSKey', 16)
