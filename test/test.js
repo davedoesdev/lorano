@@ -37,7 +37,7 @@ function start(cb)
     {
         // USE YOUR OWN IDS!
         appid: Buffer.alloc(8),
-        netid: Buffer.from([0x00, 0x00, 0x00]) // 7 lsb = NwkId
+        netid: crypto.randomBytes(3) // 7 lsb = NwkId
     });
     link.on('ready', cb);
     link.on('error', cb);
