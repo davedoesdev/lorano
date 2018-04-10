@@ -7,6 +7,10 @@ exports.up = async knex => {
                  .notNullable();
             table.binary('AppSKey', 16)
                  .notNullable();
+            table.integer('FCntUp')
+                 .defaultTo(0);
+            table.integer('FCntDown')
+                 .defaultTo(0);
         });
 };
 

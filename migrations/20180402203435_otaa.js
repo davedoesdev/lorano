@@ -10,6 +10,10 @@ exports.up = async knex => {
                  .notNullable();
             table.binary('NwkSKey', 16);
             table.binary('AppSKey', 16);
+            table.integer('FCntUp')
+                 .defaultTo(0);
+            table.integer('FCntDown')
+                 .defaultTo(0);
         });
     await knex.schema
         .createTable('OTAAHistory', table => {
