@@ -1,6 +1,6 @@
 exports.up = async knex => {
     await knex.schema
-        .createTable('ABPSessions', table => {
+        .createTable('ABPDevices', table => {
             table.binary('DevAddr', 4)
                  .primary();
             table.binary('NwkSKey', 16)
@@ -16,5 +16,5 @@ exports.up = async knex => {
 
 exports.down = async knex => {
     await knex.schema
-        .dropTableIfExists('ABPSessions');
+        .dropTableIfExists('ABPDevices');
 };

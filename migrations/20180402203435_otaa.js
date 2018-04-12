@@ -1,6 +1,6 @@
 exports.up = async knex => {
     await knex.schema
-        .createTable('OTAASessions', table => {
+        .createTable('OTAADevices', table => {
             table.binary('NwkAddr', 4) // 25 lsb, 7 msb must be 0
                  .primary();
             table.binary('DevEUI', 8)
@@ -18,7 +18,7 @@ exports.up = async knex => {
     await knex.schema
         .createTable('OTAAHistory', table => {
             table.binary('DevEUI', 8)
-                 .references('DevEUI').inTable('OTAASessions');
+                 .references('DevEUI').inTable('OTAADevices');
             table.binary('DevNonce', 2);
             table.datetime('UsedAt')
                  .defaultTo(knex.fn.now());
@@ -28,7 +28,7 @@ exports.up = async knex => {
 
 exports.down = async knex => {
     await knex.schema
-        .dropTableIfExists('OTAASessions');
+        .dropTableIfExists('OTAADevices');
     await knex.schema
         .dropTableIfExists('OTAAHistory');
 };

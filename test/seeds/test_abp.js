@@ -1,6 +1,6 @@
 exports.seed = async knex => {
-    await knex('ABPSessions').del()
-    await knex('ABPSessions').insert([
+    await knex('ABPDevices').del()
+    await knex('ABPDevices').insert([
     {
         // USE YOUR OWN KEYS!
         DevAddr: Buffer.alloc(4),

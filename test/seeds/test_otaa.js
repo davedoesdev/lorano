@@ -14,10 +14,10 @@ const crypto = require('crypto'),
             .argv;
 
 exports.seed = async knex => {
-    await knex('OTAASessions').del();
+    await knex('OTAADevices').del();
     let nwk_addr = crypto.randomBytes(4);
     nwk_addr[0] &= 0x01;
-    await knex('OTAASessions').insert(
+    await knex('OTAADevices').insert(
     {
         NwkAddr: nwk_addr,
         DevEUI: argv.deveui,
