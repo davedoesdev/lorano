@@ -1,2 +1,3 @@
 /node_modules
 /test/lorano.sqlite3
+/.nyc_output

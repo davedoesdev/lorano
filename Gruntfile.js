@@ -31,7 +31,7 @@ module.exports = function (grunt)
             },
 
             cover: {
-                cmd: "./node_modules/.bin/nyc -x Gruntfile.js -x 'test/**' node ./node_modules/.bin/grunt test"
+                cmd: "./node_modules/.bin/nyc -x Gruntfile.js -x knexfile.js -x 'test/**' node ./node_modules/.bin/grunt test" + args
             },
 
             cover_report: {
