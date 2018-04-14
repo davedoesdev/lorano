@@ -10,9 +10,19 @@ const Link = require('..'),
       expect = require('chai').expect,
       path = require('path'),
       crypto = require('crypto'),
-      deveui = require('yargs').argv.deveui;
+      { LeftDuplex } = require('./memory-duplex'),
+      deveui = require('yargs').argv.deveui,
+      PROTOCOL_VERSION = 2,
+      pkts = {
+          PUSH_DATA: 0,
+          PUSH_ACK: 1,
+          PULL_DATA: 2,
+          PULL_RESP: 3,
+          PULL_ACK: 4,
+          TX_ACK: 5
+      };
 
-let link, TestModel;
+let link, TestModel, uplink, downlink;
 
 before(function ()
 {
@@ -30,13 +40,67 @@ before(function ()
 
 function start_simulate(otaa, cb)
 {
-    // TODO: Generate join, check accept (if otaa), simulate and check data
-    return cb();
+    uplink = new LeftDuplex();
+    downlink = new LeftDuplex();
+
+    link = new Link(TestModel, uplink.right, downlink.right,
+    {
+        appid: Buffer.alloc(8),
+        netid: crypto.randomBytes(3)
+    });
+
+    (async () =>
+    {
+        const up = aw.createDuplexer(uplink),
+              down = aw.createDuplexer(downlink),
+              pull_data = Buffer.alloc(12);
+
+        pull_data[0] = PROTOCOL_VERSION;
+        crypto.randomFillSync(pull_data, 1, 2);
+        pull_data[3] = pkts.PULL_DATA;
+        await down.writeAsync(pull_data);
+
+        const pull_ack = await down.readAsync();
+        expect(pull_ack.length).to.equal(4);
+        expect(pull_ack[0]).to.equal(PROTOCOL_VERSION);
+        expect(pull_ack[1]).to.equal(pull_data[1]);
+        expect(pull_ack[2]).to.equal(pull_data[2]);
+        expect(pull_ack[3]).to.equal(pkts.PULL_ACK);
+            
+        if (otaa)
+        {
+            const push_data = Buffer.alloc(12);
+            push_data[0] = PROTOCOL_VERSION;
+            crypto.randomFillSync(push_data, 1, 2);
+            push_data[3] = pkts.PUSH_DATA;
+            await up.writeAsync(Buffer.concat(
+            [
+                push_data,
+                Buffer.from(JSON.stringify(
+                {
+                    rxpk: [{
+                        // TODO: join request
+                    }]
+                }))
+            ]));
+
+            //TODO: expect PUSH_ACK
+
+        
+            // TODO: check join accept
+        }
+
+        // TODO: simulate and check data
+    })();
+
+    link.on('ready', cb);
+    link.on('error', cb);
 }
 
 function stop_simulate(cb)
 {
-    // TODO: End the streams
+    uplink.end();
+    downlink.end();
     return cb();
 }
 
@@ -123,7 +187,7 @@ async function same_data_sent()
         send_payload = Buffer.concat([recv_data.payload.slice(0, payload_size/2),
                                       crypto.randomBytes(payload_size/2)]);
         recv_data.reply.payload = send_payload;
-        await(duplex.writeAsync(recv_data.reply));
+        await duplex.writeAsync(recv_data.reply);
     }
 }
 
