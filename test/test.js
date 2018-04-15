@@ -5,6 +5,7 @@
 const Link = require('..'),
       lora_comms = require('lora-comms'),
       aw = require('awaitify-stream'),
+      lora_packet = require('lora-packet'),
       { Model } = require('objection'),
       Knex = require('knex'),
       expect = require('chai').expect,
@@ -43,14 +44,18 @@ function start_simulate(otaa, cb)
     uplink = new LeftDuplex();
     downlink = new LeftDuplex();
 
+    const appid = Buffer.alloc(8),
+          netid = crypto.randomBytes(3),
+          deveui = Buffer.alloc(8),
+          app_key = Buffer.alloc(16);
+
     link = new Link(TestModel, uplink.right, downlink.right,
     {
-        appid: Buffer.alloc(8),
-        netid: crypto.randomBytes(3)
+        appid: appid,
+        netid: netid
     });
 
-    (async () =>
-    {
+    (async () => { try {
         const up = aw.createDuplexer(uplink),
               down = aw.createDuplexer(downlink),
               pull_data = Buffer.alloc(12);
@@ -79,19 +84,40 @@ function start_simulate(otaa, cb)
                 Buffer.from(JSON.stringify(
                 {
                     rxpk: [{
-                        // TODO: join request
+                        data: lora_packet.fromFields({
+                            MType: 'Join Request',
+                            AppEUI: appid,
+                            DevEUI: deveui,
+                            DevNonce: crypto.randomBytes(2)
+                        }, null, null, app_key).getPHYPayload().toString('base64')
                     }]
                 }))
             ]));
 
-            //TODO: expect PUSH_ACK
+            const push_ack = await up.readAsync();
+            expect(push_ack.length).to.equal(4);
+            expect(push_ack[0]).to.equal(PROTOCOL_VERSION);
+            expect(push_ack[1]).to.equal(push_data[1]);
+            expect(push_ack[2]).to.equal(push_data[2]);
+            expect(push_ack[3]).to.equal(pkts.PUSH_ACK);
+     
+            const pull_resp = await down.readAsync();
+            expect(pull_resp.length).to.be.at.least(4);
+            expect(pull_resp[0]).to.equal(PROTOCOL_VERSION);
+            expect(pull_resp[3]).to.equal(pkts.PULL_RESP);
 
+            console.log(JSON.parse(pull_resp.slice(4)));
+
+ 
         
             // TODO: check join accept
+            // calculate session key
         }
 
         // TODO: simulate and check data
-    })();
+    } catch (ex) {
+        console.error(ex);
+    }})();
 
     link.on('ready', cb);
     link.on('error', cb);
