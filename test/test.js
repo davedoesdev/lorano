@@ -229,6 +229,10 @@ function start_simulate(options, cb)
             const tx_ack = Buffer.alloc(12);
             tx_ack[0] = PROTOCOL_VERSION;
             tx_ack[1] = pull_resp[1];
+            if (options.write_wrong_tx_ack_token)
+            {
+                tx_ack[1] ^= 0xff;
+            }
             tx_ack[2] = pull_resp[2];
             tx_ack[3] = pkts.TX_ACK;
             await down.writeAsync(tx_ack);
@@ -385,7 +389,7 @@ describe('should emit error when writing to unjoined device', function ()
     }, cb));
     afterEach(stop_simulate);
 
-    it('should receive same data sent', async () =>
+    it('should error sending data', async () =>
     {
         let err;
         try
@@ -550,6 +554,65 @@ describe('should emit error when writing to unknown device', function ()
             err = ex;
         }
         expect(err.message).to.equal('unknown device');
+    });
+});
+
+describe('should emit error when FCntDownMax exceeded', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        FCntDownMax: -1,
+        error_handler: function (err)
+        {
+            expect(err.message).to.equal('send frame count exceeded');
+        }
+    }, cb));
+    afterEach(stop_simulate);
+
+    it('should error sending data', async () =>
+    {
+        let err;
+        try
+        {
+            const deveui = Buffer.alloc(8),
+                  dev_addr = link.nwk_addr_to_dev_addr((await link._deveui_to_otaa_device(deveui)).NwkAddr),
+                  write = promisify((data, cb) => link.write(data, cb));
+            await write({ encoding: { DevAddr: dev_addr } });
+        }
+        catch (ex)
+        {
+            err = ex;
+        }
+        expect(err.message).to.equal('send frame count exceeded');
+    });
+});
+
+describe('should emit error when TX_ACK token does not match', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        write_wrong_tx_ack_token: true,
+        error_handler: function (err)
+        {
+            expect(err.message).to.equal('TX_ACK token mismatch');
+        }
+    }, cb));
+    afterEach(stop_simulate);
+
+    it('should receive same data sent', async () =>
+    {
+        let err;
+        try
+        {
+            await same_data_sent();
+        }
+        catch (ex)
+        {
+            err = ex;
+        }
+        expect(err.message).to.equal('TX_ACK token mismatch');
     });
 });
 
