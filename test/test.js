@@ -82,34 +82,60 @@ function start_simulate(options, cb)
         let dev_addr, nwk_skey, app_skey;
         if (options.otaa)
         {
-            const push_data = Buffer.alloc(12);
-            push_data[0] = PROTOCOL_VERSION;
-            crypto.randomFillSync(push_data, 1, 2);
-            push_data[3] = pkts.PUSH_DATA;
             const dev_nonce = crypto.randomBytes(2);
-            await up.writeAsync(Buffer.concat(
-            [
-                push_data,
-                Buffer.from(JSON.stringify(
-                {
-                    rxpk: [{
-                        data: lora_packet.fromFields({
-                            MType: 'Join Request',
-                            AppEUI: appid,
-                            DevEUI: deveui,
-                            DevNonce: dev_nonce
-                        }, null, null, app_key).getPHYPayload().toString('base64')
-                    }]
-                }))
-            ]));
+            const request_join = async (appid, deveui, app_key) =>
+            {
+                const push_data = Buffer.alloc(12);
+                push_data[0] = PROTOCOL_VERSION;
+                crypto.randomFillSync(push_data, 1, 2);
+                push_data[3] = pkts.PUSH_DATA;
+                await up.writeAsync(Buffer.concat(
+                [
+                    push_data,
+                    Buffer.from(JSON.stringify(
+                    {
+                        rxpk: [{
+                            data: lora_packet.fromFields({
+                                MType: 'Join Request',
+                                AppEUI: appid,
+                                DevEUI: deveui,
+                                DevNonce: dev_nonce
+                            }, null, null, app_key).getPHYPayload().toString('base64')
+                        }]
+                    }))
+                ]));
+                const push_ack = await up.readAsync();
+                expect(push_ack.length).to.equal(4);
+                expect(push_ack[0]).to.equal(PROTOCOL_VERSION);
+                expect(push_ack[1]).to.equal(push_data[1]);
+                expect(push_ack[2]).to.equal(push_data[2]);
+                expect(push_ack[3]).to.equal(pkts.PUSH_ACK);
+            };
 
-            const push_ack = await up.readAsync();
-            expect(push_ack.length).to.equal(4);
-            expect(push_ack[0]).to.equal(PROTOCOL_VERSION);
-            expect(push_ack[1]).to.equal(push_data[1]);
-            expect(push_ack[2]).to.equal(push_data[2]);
-            expect(push_ack[3]).to.equal(pkts.PUSH_ACK);
-     
+            await request_join(appid, deveui, app_key);
+            if (options.send_join_with_unknown_appid)
+            {
+                const appid2 = Buffer.from(appid);
+                appid2[0] ^= 0xff;
+                await request_join(appid2, deveui, app_key);
+            }
+            if (options.send_join_with_unknown_deveui)
+            {
+                const deveui2 = Buffer.from(deveui);
+                deveui2[0] ^= 0xff;
+                await request_join(appid, deveui2, app_key);
+            }
+            if (options.send_join_with_wrong_appkey)
+            {
+                const app_key2 = Buffer.from(app_key);
+                app_key2[0] ^= 0xff;
+                await request_join(appid, deveui, app_key2);
+            }
+            if (options.replay_join)
+            {
+                await request_join(appid, deveui, app_key);
+            }
+
             const pull_resp = await down.readAsync();
             if (!pull_resp) { return; }
             expect(pull_resp.length).to.be.at.least(4);
@@ -614,6 +640,66 @@ describe('should emit error when TX_ACK token does not match', function ()
         }
         expect(err.message).to.equal('TX_ACK token mismatch');
     });
+});
+
+describe('should ignore join requests with unknown appid', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        send_join_with_unknown_appid: true
+    }, cb));
+    afterEach(stop_simulate);
+
+    it('should receive same data sent', same_data_sent);
+});
+
+describe('should ignore join requests with unknown deveui', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        send_join_with_unknown_deveui: true
+    }, cb));
+    afterEach(stop_simulate);
+
+    it('should receive same data sent', same_data_sent);
+});
+
+describe('should ignore join requests with wrong app key', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        send_join_with_wrong_appkey : true
+    }, cb));
+    afterEach(stop_simulate);
+
+    it('should receive same data sent', same_data_sent);
+});
+
+describe('should ignore replayed join requests and emit join_reply event', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        replay_join : true
+    }, cb));
+    afterEach(stop_simulate);
+
+    it('should receive same data sent', async () =>
+    {
+        let called = false;
+        link.on('join_replay', () =>
+        {
+            called = true;
+        });
+        await same_data_sent();
+        expect(called).to.be.true;
+    });
+    
+    
+    
 });
 
 
