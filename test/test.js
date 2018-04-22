@@ -79,10 +79,43 @@ function start_simulate(options, cb)
         expect(pull_ack[2]).to.equal(pull_data[2]);
         expect(pull_ack[3]).to.equal(pkts.PULL_ACK);
 
+        const payload_size = 12;
         let dev_addr, nwk_skey, app_skey;
+        let fcnt_up = 0, fcnt_down = 0;
         if (options.otaa)
         {
             const dev_nonce = crypto.randomBytes(2);
+
+            if (options.send_data_before_joined)
+            {
+                const push_data = Buffer.alloc(12);
+                push_data[0] = PROTOCOL_VERSION;
+                crypto.randomFillSync(push_data, 1, 2);
+                push_data[3] = pkts.PUSH_DATA;
+                await up.writeAsync(Buffer.concat(
+                [
+                    push_data,
+                    Buffer.from(JSON.stringify(
+                    {
+                        rxpk: [{
+                            data: lora_packet.fromFields({
+                                MType: 'Unconfirmed Data Up',
+                                DevAddr: link.nwk_addr_to_dev_addr((await link._deveui_to_otaa_device(deveui)).NwkAddr),
+                                payload: Buffer.alloc(payload_size),
+                                FCnt: fcnt_up++
+                            }, Buffer.alloc(16), Buffer.alloc(16)).getPHYPayload().toString('base64')
+                        }]
+                    }))
+                ]));
+
+                const push_ack = await up.readAsync();
+                expect(push_ack.length).to.equal(4);
+                expect(push_ack[0]).to.equal(PROTOCOL_VERSION);
+                expect(push_ack[1]).to.equal(push_data[1]);
+                expect(push_ack[2]).to.equal(push_data[2]);
+                expect(push_ack[3]).to.equal(pkts.PUSH_ACK);
+            }
+
             const request_join = async (appid, deveui, app_key) =>
             {
                 const push_data = Buffer.alloc(12);
@@ -171,7 +204,10 @@ function start_simulate(options, cb)
             expect(buffers.DevAddr[0] >> 1).to.equal(netid[2] & 0x7f);
             dev_addr = buffers.DevAddr;
             expect((await link.dev_addr_to_deveui(dev_addr)).equals(deveui)).to.be.true;
-
+            const dev_addr2 = Buffer.from(dev_addr);
+            dev_addr2[0] ^= 0xff;
+            expect(await link.dev_addr_to_deveui(dev_addr2)).to.equal(null);
+            
             nwk_skey = Link.skey(netid, app_key, 0x01, buffers.AppNonce, dev_nonce);
             app_skey = Link.skey(netid, app_key, 0x02, buffers.AppNonce, dev_nonce);
         }
@@ -182,10 +218,7 @@ function start_simulate(options, cb)
             app_skey = Buffer.alloc(16);
         }
 
-        const payload_size = 12;
         let recv_payload = Buffer.alloc(payload_size);
-
-        let fcnt_up = 0, fcnt_down = 0;
 
         while (true)
         {
@@ -195,33 +228,53 @@ function start_simulate(options, cb)
                 recv_payload.slice(payload_size / 2)
             ]);
 
-            const push_data = Buffer.alloc(12);
-            push_data[0] = PROTOCOL_VERSION;
-            crypto.randomFillSync(push_data, 1, 2);
-            push_data[3] = pkts.PUSH_DATA;
-            await up.writeAsync(Buffer.concat(
-            [
-                push_data,
-                Buffer.from(JSON.stringify(
-                {
-                    rxpk: [{
-                        data: lora_packet.fromFields({
-                            MType: 'Unconfirmed Data Up',
-                            DevAddr: dev_addr,
-                            payload: send_payload,
-                            FCnt: fcnt_up++
-                        }, app_skey, nwk_skey).getPHYPayload().toString('base64')
-                    }]
-                }))
-            ]));
+            const send_data = async (dev_addr, nwk_skey, fcnt_up) =>
+            {
+                const push_data = Buffer.alloc(12);
+                push_data[0] = PROTOCOL_VERSION;
+                crypto.randomFillSync(push_data, 1, 2);
+                push_data[3] = pkts.PUSH_DATA;
+                await up.writeAsync(Buffer.concat(
+                [
+                    push_data,
+                    Buffer.from(JSON.stringify(
+                    {
+                        rxpk: [{
+                            data: lora_packet.fromFields({
+                                MType: 'Unconfirmed Data Up',
+                                DevAddr: dev_addr,
+                                payload: send_payload,
+                                FCnt: fcnt_up
+                            }, app_skey, nwk_skey).getPHYPayload().toString('base64')
+                        }]
+                    }))
+                ]));
 
-            const push_ack = await up.readAsync();
-            expect(push_ack.length).to.equal(4);
-            expect(push_ack[0]).to.equal(PROTOCOL_VERSION);
-            expect(push_ack[1]).to.equal(push_data[1]);
-            expect(push_ack[2]).to.equal(push_data[2]);
-            expect(push_ack[3]).to.equal(pkts.PUSH_ACK);
+                const push_ack = await up.readAsync();
+                expect(push_ack.length).to.equal(4);
+                expect(push_ack[0]).to.equal(PROTOCOL_VERSION);
+                expect(push_ack[1]).to.equal(push_data[1]);
+                expect(push_ack[2]).to.equal(push_data[2]);
+                expect(push_ack[3]).to.equal(pkts.PUSH_ACK);
+            };
 
+            await send_data(dev_addr, nwk_skey, fcnt_up++);
+            if (options.send_data_with_unknown_devaddr)
+            {
+                const dev_addr2 = Buffer.from(dev_addr);
+                dev_addr2[0] ^= 0xff;
+                await send_data(dev_addr2, nwk_skey, fcnt_up++);
+            }
+            if (options.send_data_with_wrong_session_key)
+            {
+                const nwk_skey2 = Buffer.from(nwk_skey);
+                nwk_skey2[0] ^= 0xff;
+                await send_data(dev_addr, nwk_skey2, fcnt_up++);
+            }
+            if (options.replay_data)
+            {
+                await send_data(dev_addr, nwk_skey, fcnt_up - 1);
+            }
             if (options.send_no_rxpk)
             {
                 const push_data = Buffer.alloc(12);
@@ -435,6 +488,27 @@ describe('should emit error when writing to unjoined device', function ()
             err = ex;
         }
         expect(err.message).to.equal('device not joined');
+    });
+});
+
+describe('should emit not_joined event when packet received from unjoined OTAA device', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        send_data_before_joined : true
+    }, cb));
+    afterEach(stop_simulate);
+
+    it('should receive same data sent', async () =>
+    {
+        let called = false;
+        link.on('not_joined', () =>
+        {
+            called = true;
+        });
+        await same_data_sent();
+        expect(called).to.be.true;
     });
 });
 
@@ -666,7 +740,7 @@ describe('should ignore join requests with unknown deveui', function ()
     it('should receive same data sent', same_data_sent);
 });
 
-describe('should ignore join requests with wrong app key', function ()
+describe('should ignore join requests with wrong app key and emit verify_mic event', function ()
 {
     beforeEach(cb => start_simulate(
     {
@@ -675,10 +749,21 @@ describe('should ignore join requests with wrong app key', function ()
     }, cb));
     afterEach(stop_simulate);
 
-    it('should receive same data sent', same_data_sent);
+    it('should receive same data sent', async () =>
+    {
+        let called = false;
+        link.on('verify_mic_failed', (device, decoded) =>
+        {
+            expect(device.DevEUI.equals(Buffer.alloc(8))).to.be.true;
+            expect(decoded.getBuffers().DevEUI.equals(Buffer.alloc(8))).to.be.true;
+            called = true;
+        });
+        await same_data_sent();
+        expect(called).to.be.true;
+    });
 });
 
-describe('should ignore replayed join requests and emit join_reply event', function ()
+describe('should ignore replayed join requests and emit join_replay event', function ()
 {
     beforeEach(cb => start_simulate(
     {
@@ -690,19 +775,69 @@ describe('should ignore replayed join requests and emit join_reply event', funct
     it('should receive same data sent', async () =>
     {
         let called = false;
-        link.on('join_replay', () =>
+        link.on('join_replay', (device, decoded, ex) =>
         {
+            expect(device.DevEUI.equals(Buffer.alloc(8))).to.be.true;
+            expect(decoded.getBuffers().DevEUI.equals(Buffer.alloc(8))).to.be.true;
             called = true;
         });
         await same_data_sent();
         expect(called).to.be.true;
     });
-    
-    
-    
 });
 
+describe('should ignore data packets with unknown devaddr', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        send_data_with_unknown_devaddr: true
+    }, cb));
+    afterEach(stop_simulate);
 
+    it('should receive same data sent', same_data_sent);
+});
 
+describe('should ignore data packets with wrong session key and emit verify_mic event', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        send_data_with_wrong_session_key : true
+    }, cb));
+    afterEach(stop_simulate);
 
-// TODO: Fill in coverage by simulating requests
+    it('should receive same data sent', async () =>
+    {
+        let called = false;
+        link.on('verify_mic_failed', (device, decoded) =>
+        {
+            expect(device.DevEUI.equals(Buffer.alloc(8))).to.be.true;
+            called = true;
+        });
+        await same_data_sent();
+        expect(called).to.be.true;
+    });
+});
+
+describe('should ignore replayed data packets and emit data_replay event', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        replay_data : true
+    }, cb));
+    afterEach(stop_simulate);
+
+    it('should receive same data sent', async () =>
+    {
+        let called = false;
+        link.on('data_replay', (device, decoded) =>
+        {
+            expect(device.DevEUI.equals(Buffer.alloc(8))).to.be.true;
+            called = true;
+        });
+        await same_data_sent();
+        expect(called).to.be.true;
+    });
+});
