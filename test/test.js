@@ -14,7 +14,14 @@ const Link = require('..'),
       promisify = require('util').promisify,
       delay = promisify(setTimeout),
       { LeftDuplex } = require('./memory-duplex'),
-      deveui = require('yargs').argv.deveui,
+      yargs = require('yargs'),
+      argv = yargs
+          .option('deveui', {
+              type: 'string',
+              coerce: arg => Buffer.from(arg, 'hex'),
+              default: Buffer.alloc(8)
+          }).argv,
+      deveui = argv.deveui,
       PROTOCOL_VERSION = 2,
       pkts = {
           PUSH_DATA: 0,
@@ -48,7 +55,6 @@ function start_simulate(options, cb)
 
     const appid = Buffer.alloc(8),
           netid = crypto.randomBytes(3),
-          deveui = Buffer.alloc(8),
           app_key = Buffer.alloc(16);
 
     link = new Link(TestModel, uplink.right, downlink.right, Object.assign(
@@ -353,7 +359,7 @@ function stop_simulate(cb)
 
 function start(cb)
 {
-    if (!deveui)
+    if (!yargs(process.argv).argv.deveui)
     {
         return start_simulate({ otaa: true }, cb);
     }
@@ -374,7 +380,7 @@ function start(cb)
 
 function stop(cb)
 {
-    if (!deveui)
+    if (!yargs(process.argv).argv.deveui)
     {
         return stop_simulate(cb);
     }
@@ -391,7 +397,7 @@ process.on('SIGINT', () => stop(() => {}));
 
 function wait_for_logs(cb)
 {
-    if (!deveui || !lora_comms.logging_active)
+    if (!yargs(process.argv).argv.deveui || !lora_comms.logging_active)
     {
         return cb();
     }
@@ -473,8 +479,7 @@ describe('should emit error when writing to unjoined device', function ()
         let err;
         try
         {
-            const deveui = Buffer.alloc(8),
-                  dev_addr = link.nwk_addr_to_dev_addr((await link._deveui_to_otaa_device(deveui)).NwkAddr),
+            const dev_addr = link.nwk_addr_to_dev_addr((await link._deveui_to_otaa_device(deveui)).NwkAddr),
                   write = promisify((data, cb) => link.write(data, cb));
             await write(
             {
@@ -675,8 +680,7 @@ describe('should emit error when FCntDownMax exceeded', function ()
         let err;
         try
         {
-            const deveui = Buffer.alloc(8),
-                  dev_addr = link.nwk_addr_to_dev_addr((await link._deveui_to_otaa_device(deveui)).NwkAddr),
+            const dev_addr = link.nwk_addr_to_dev_addr((await link._deveui_to_otaa_device(deveui)).NwkAddr),
                   write = promisify((data, cb) => link.write(data, cb));
             await write({ encoding: { DevAddr: dev_addr } });
         }
@@ -754,8 +758,8 @@ describe('should ignore join requests with wrong app key and emit verify_mic eve
         let called = false;
         link.on('verify_mic_failed', (device, decoded) =>
         {
-            expect(device.DevEUI.equals(Buffer.alloc(8))).to.be.true;
-            expect(decoded.getBuffers().DevEUI.equals(Buffer.alloc(8))).to.be.true;
+            expect(device.DevEUI.equals(deveui)).to.be.true;
+            expect(decoded.getBuffers().DevEUI.equals(deveui)).to.be.true;
             called = true;
         });
         await same_data_sent();
@@ -777,8 +781,8 @@ describe('should ignore replayed join requests and emit join_replay event', func
         let called = false;
         link.on('join_replay', (device, decoded, ex) =>
         {
-            expect(device.DevEUI.equals(Buffer.alloc(8))).to.be.true;
-            expect(decoded.getBuffers().DevEUI.equals(Buffer.alloc(8))).to.be.true;
+            expect(device.DevEUI.equals(deveui)).to.be.true;
+            expect(decoded.getBuffers().DevEUI.equals(deveui)).to.be.true;
             called = true;
         });
         await same_data_sent();
@@ -812,7 +816,7 @@ describe('should ignore data packets with wrong session key and emit verify_mic 
         let called = false;
         link.on('verify_mic_failed', (device, decoded) =>
         {
-            expect(device.DevEUI.equals(Buffer.alloc(8))).to.be.true;
+            expect(device.DevEUI.equals(deveui)).to.be.true;
             called = true;
         });
         await same_data_sent();
@@ -834,7 +838,7 @@ describe('should ignore replayed data packets and emit data_replay event', funct
         let called = false;
         link.on('data_replay', (device, decoded) =>
         {
-            expect(device.DevEUI.equals(Buffer.alloc(8))).to.be.true;
+            expect(device.DevEUI.equals(deveui)).to.be.true;
             called = true;
         });
         await same_data_sent();
