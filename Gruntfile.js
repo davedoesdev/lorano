@@ -52,13 +52,22 @@ module.exports = function (grunt)
 
             serve_documentation: {
                 cmd: './node_modules/.bin/documentation serve -w -c documentation.yml lib/lora-comms.js'
+            },
+
+            example: {
+                cmd: 'node ./example/example.js'
             }
         },
 
         copy: {
-            db: {
+            test_db: {
                 src: 'lorano.empty.sqlite3',
                 dest: 'test/lorano.sqlite3'
+            },
+
+            example_db: {
+                src: 'lorano.empty.sqlite3',
+                dest: 'example/lorano.sqlite3'
             }
         }
     });
@@ -69,12 +78,14 @@ module.exports = function (grunt)
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('lint', 'eslint');
-    grunt.registerTask('test', ['copy:db',
+    grunt.registerTask('test', ['copy:test_db',
                                 'exec:seed',
                                 'mochaTest']);
     grunt.registerTask('coverage', ['exec:cover',
                                     'exec:cover_report',
                                     'exec:cover_check']);
+    grunt.registerTask('example', ['copy:example_db',
+                                   'exec:example']);
     grunt.registerTask('coveralls', 'exec:coveralls');
     grunt.registerTask('docs', 'exec:documentation');
     grunt.registerTask('serve_docs', 'exec:serve_documentation');
