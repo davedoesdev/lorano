@@ -52,10 +52,6 @@ module.exports = function (grunt)
 
             serve_documentation: {
                 cmd: './node_modules/.bin/documentation serve -w -c documentation.yml lib/lora-comms.js'
-            },
-
-            example: {
-                cmd: 'node ./example/example.js'
             }
         },
 
@@ -85,9 +81,15 @@ module.exports = function (grunt)
                                     'exec:cover_report',
                                     'exec:cover_check']);
     grunt.registerTask('example', ['copy:example_db',
-                                   'exec:example']);
+                                   'run_example']);
     grunt.registerTask('coveralls', 'exec:coveralls');
     grunt.registerTask('docs', 'exec:documentation');
     grunt.registerTask('serve_docs', 'exec:serve_documentation');
     grunt.registerTask('default', ['lint', 'test']);
+
+    grunt.registerTask('run_example', 'run example', function ()
+    {
+        require('lora-comms').on('stop', this.async());
+        require('./example/example');
+    });
 };

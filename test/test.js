@@ -73,17 +73,20 @@ function start_simulate(options, cb)
             await down.writeAsync(pull_data.slice(0, 1));
         }
 
-        pull_data[0] = PROTOCOL_VERSION;
-        crypto.randomFillSync(pull_data, 1, 2);
-        pull_data[3] = pkts.PULL_DATA;
-        await down.writeAsync(pull_data);
+        for (let i = 0; i < (options.multiple_pull_data ? 10 : 1); ++i)
+        {
+            pull_data[0] = PROTOCOL_VERSION;
+            crypto.randomFillSync(pull_data, 1, 2);
+            pull_data[3] = pkts.PULL_DATA;
+            await down.writeAsync(pull_data);
 
-        const pull_ack = await down.readAsync();
-        expect(pull_ack.length).to.equal(4);
-        expect(pull_ack[0]).to.equal(PROTOCOL_VERSION);
-        expect(pull_ack[1]).to.equal(pull_data[1]);
-        expect(pull_ack[2]).to.equal(pull_data[2]);
-        expect(pull_ack[3]).to.equal(pkts.PULL_ACK);
+            const pull_ack = await down.readAsync();
+            expect(pull_ack.length).to.equal(4);
+            expect(pull_ack[0]).to.equal(PROTOCOL_VERSION);
+            expect(pull_ack[1]).to.equal(pull_data[1]);
+            expect(pull_ack[2]).to.equal(pull_data[2]);
+            expect(pull_ack[3]).to.equal(pkts.PULL_ACK);
+        }
 
         const payload_size = 12;
         let dev_addr, nwk_skey, app_skey;
@@ -501,7 +504,7 @@ describe('should emit not_joined event when packet received from unjoined OTAA d
     beforeEach(cb => start_simulate(
     {
         otaa: true,
-        send_data_before_joined : true
+        send_data_before_joined: true
     }, cb));
     afterEach(stop_simulate);
 
@@ -749,7 +752,7 @@ describe('should ignore join requests with wrong app key and emit verify_mic eve
     beforeEach(cb => start_simulate(
     {
         otaa: true,
-        send_join_with_wrong_appkey : true
+        send_join_with_wrong_appkey: true
     }, cb));
     afterEach(stop_simulate);
 
@@ -772,7 +775,7 @@ describe('should ignore replayed join requests and emit join_replay event', func
     beforeEach(cb => start_simulate(
     {
         otaa: true,
-        replay_join : true
+        replay_join: true
     }, cb));
     afterEach(stop_simulate);
 
@@ -807,7 +810,7 @@ describe('should ignore data packets with wrong session key and emit verify_mic 
     beforeEach(cb => start_simulate(
     {
         otaa: true,
-        send_data_with_wrong_session_key : true
+        send_data_with_wrong_session_key: true
     }, cb));
     afterEach(stop_simulate);
 
@@ -829,7 +832,7 @@ describe('should ignore replayed data packets and emit data_replay event', funct
     beforeEach(cb => start_simulate(
     {
         otaa: true,
-        replay_data : true
+        replay_data: true
     }, cb));
     afterEach(stop_simulate);
 
@@ -844,4 +847,16 @@ describe('should ignore replayed data packets and emit data_replay event', funct
         await same_data_sent();
         expect(called).to.be.true;
     });
+});
+
+describe('should reply to multiple PULL_DATA messages', function ()
+{
+    beforeEach(cb => start_simulate(
+    {
+        otaa: true,
+        multiple_pull_data: true
+    }, cb));
+    afterEach(stop_simulate);
+
+    it('should receive same data sent', same_data_sent);
 });

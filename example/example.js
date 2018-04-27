@@ -4,6 +4,13 @@ const Link = require('..');
 const lora_comms = require('lora-comms');
 const { Model } = require('objection');
 
+// Start radio
+process.on('SIGINT', lora_comms.stop);
+lora_comms.start_logging();
+lora_comms.log_info.pipe(process.stdout);
+lora_comms.log_error.pipe(process.stderr);
+lora_comms.start();
+
 // Connect to database
 const knex = require('knex')({
     client: 'sqlite3',
@@ -14,41 +21,38 @@ const knex = require('knex')({
 });
 Model.knex(knex);
 
-// Start radio on this device
-process.on('SIGINT', lora_comms.stop);
-lora_comms.start_logging();
-lora_comms.log_info.pipe(process.stdout);
-lora_comms.log_error.pipe(process.stderr);
-lora_comms.start();
-
-new Link(Model, lora_comms.uplink, lora_comms.downlink, {
+const link = new Link(Model, lora_comms.uplink, lora_comms.downlink, {
     // USE YOUR OWN IDS!
     appid: Buffer.alloc(8),
     netid: crypto.randomBytes(3) // 7 lsb = NwkId
-}).on('ready', async () =>
+});
+
+link.on('ready', async () =>
 {
-    // Insert device (usually you'll seed the database as a separate task)
+    // Add device (usually you'll seed the database as a separate task)
     const nwk_addr = crypto.randomBytes(4); // 25 lsb
     nwk_addr[0] &= 0x01; // 7 msb must be 0
     await knex('OTAADevices').insert({
         // USE YOUR OWN VALUES!
         NwkAddr: nwk_addr,
-        DevEUI: Buffer.alloc(8),
+        DevEUI: Buffer.from('0004A30B001F0368', 'hex'),
         AppKey: Buffer.alloc(16)
     });
 
     // Receive and send packets until we get a match
 
+    const duplex = require('awaitify-stream').createDuplexer(link);
     const payload_size = 12;
-    const send_payload = crypto.randomBytes(payload_size);
-    const duplex = require('awaitify-stream').createDuplexer(this);
+    let send_payload = crypto.randomBytes(payload_size);
 
     while (true) {
         const recv_data = await duplex.readAsync();
+        if (recv_data === null) {
+            return;
+        }
         if (recv_data.payload.length !== payload_size) {
             continue;
         }
-
         if (recv_data.payload.equals(send_payload)) {
             // Shouldn't happen because send on reverse polarity
             console.error('ERROR: Received packet we sent');
