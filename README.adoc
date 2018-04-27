@@ -1,0 +1,188 @@
+= lorano{nbsp}{nbsp}{nbsp}image:https://circleci.com/gh/davedoesdev/lorano.svg?style=svg[Build Status,link=https://circleci.com/gh/davedoesdev/lorano] image:https://coveralls.io/repos/github/davedoesdev/lorano/badge.svg[Coverage Status,link=https://coveralls.io/github/davedoesdev/lorano] image:https://img.shields.io/npm/v/lorano.svg[NPM version,link=https://www.npmjs.com/package/lorano]
+:prewrap!:
+
+High-level Node.js module for reading and writing LoRa packets.
+It uses streams supplied by https://github.com/davedoesdev/node-lora-comms[node-lora-comms] and https://github.com/anthonykirby/lora-packet[Anthony Kirby's excellent packet decoder].
+
+Tested on a Raspberry Pi 3 Model B with an IMST iC880A-SPI.
+
+Your application is given a single
+https://nodejs.org/dist/latest-v9.x/docs/api/stream.html#stream_class_stream_duplex[Duplex]
+stream operating in object mode for reading and writing packets. Replying to
+a packet typically involves just supplying a payload, though your application
+can override the default transmission settings if required.
+
+API documentation is available http://rawgit.davedoesdev.com/davedoesdev/lorano/master/docs/index.html[here].
+
+== Example
+
+This program works in conjunction with a link:test/lorano_test.ino[corresponding Arduino sketch] (tested on a http://support.sodaq.com/sodaq-one/explorer/[SODAQ Explorer]).
+
+It reads 12 byte packets from the LoRa radio, leaves the first 6 bytes
+unchanged and randomizes the randomizes the last 6 bytes. It then sends the
+packet back to the radio. The Explorer does the same but randomizes the first
+6 byes it receives, leaving the last 6 bytes unchanged.
+
+Each side then checks whether it gets back the bytes it randomized in the
+previous packet it sent.
+
+[source,javascript]
+.example.js
+----
+const path = require('path');
+const crypto = require('crypto');
+const Link = require('..');
+const lora_comms = require('lora-comms');
+const { Model } = require('objection');
+
+// Start radio
+process.on('SIGINT', lora_comms.stop);
+lora_comms.start_logging();
+lora_comms.log_info.pipe(process.stdout);
+lora_comms.log_error.pipe(process.stderr);
+lora_comms.start();
+
+// Connect to database
+const knex = require('knex')({
+    client: 'sqlite3',
+    useNullAsDefault: true,
+    connection: {
+        filename: path.join(__dirname, 'lorano.sqlite3')
+    }
+});
+Model.knex(knex);
+
+const link = new Link(Model, lora_comms.uplink, lora_comms.downlink, {
+    // USE YOUR OWN IDS!
+    appid: Buffer.alloc(8),
+    netid: crypto.randomBytes(3) // 7 lsb = NwkId
+});
+
+link.on('ready', async () =>
+{
+    // Add device (usually you'll seed the database as a separate task)
+    const nwk_addr = crypto.randomBytes(4); // 25 lsb
+    nwk_addr[0] &= 0x01; // 7 msb must be 0
+    await knex('OTAADevices').insert({
+        // USE YOUR OWN VALUES!
+        NwkAddr: nwk_addr,
+        DevEUI: Buffer.from('0000000000000000', 'hex'),
+        AppKey: Buffer.alloc(16)
+    });
+
+    // Receive and send packets until we get a match
+
+    const duplex = require('awaitify-stream').createDuplexer(link);
+    const payload_size = 12;
+    let send_payload = crypto.randomBytes(payload_size);
+
+    while (true) {
+        const recv_data = await duplex.readAsync();
+        if (recv_data === null) {
+            return;
+        }
+        if (recv_data.payload.length !== payload_size) {
+            continue;
+        }
+        if (recv_data.payload.equals(send_payload)) {
+            // Shouldn't happen because send on reverse polarity
+            console.error('ERROR: Received packet we sent');
+            continue;
+        }
+
+        if (recv_data.payload.compare(send_payload,
+                                      payload_size/2,
+                                      payload_size,
+                                      payload_size/2,
+                                      payload_size) === 0) {
+            console.log('SUCCESS: Received matching data');
+            return lora_comms.stop();
+        }
+
+        send_payload = Buffer.concat([recv_data.payload.slice(0, payload_size/2),
+                                      crypto.randomBytes(payload_size/2)]);
+        recv_data.reply.payload = send_payload;
+        await duplex.writeAsync(recv_data.reply);
+    }
+});
+----
+
+First you need to modify at least `DevEUI` with the unique identifier of your
+device. You can then run the example like this:
+
+[source,bash]
+----
+grunt example
+----
+
+== Installation
+
+[source,bash]
+----
+npm install lorano
+----
+
+== IMST iC880A-SPI reset
+
+If you're using an IMST iC880A-SPI, it needs to be reset after it's powered up.
+
+My iC880A-SPI is connected to a Pi via a
+https://shop.coredump.ch/product/ic880a-lorawan-gateway-backplane/[backplane]
+which brings the reset line out on GPIO 25. I run the following shell script
+to perform the reset:
+
+[source,sh]
+.iC880A-SPI_reset.sh
+----
+echo "25" > /sys/class/gpio/export
+echo "out" > /sys/class/gpio/gpio25/direction
+echo "1" > /sys/class/gpio/gpio25/value
+sleep 5
+echo "0" > /sys/class/gpio/gpio25/value
+sleep 1
+echo "0" > /sys/class/gpio/gpio25/value
+----
+
+== Test
+
+By default, the tests simulate LoRa packets and can be run with:
+
+[source,bash]
+----
+grunt test
+----
+
+If you have a LoRa device that can run link:test/lorano_test.ino[] then you
+can pass its DEVEUI as an argument like this:
+
+[source,bash]
+----
+grunt test --deveui=XXXXXXXXXXXXXXXX
+----
+
+I've tested this with a SODAQ Explorer.
+
+== Lint
+
+[source,bash]
+----
+grunt lint
+----
+
+== Coverage
+
+[source,bash]
+----
+grunt coverage
+----
+
+Or with a LoRa device running link:test/lorano_test.ino[]:
+
+[source,bash]
+----
+grunt test --deveui=XXXXXXXXXXXXXXXX
+----
+
+== Licence
+
+link:LICENCE[MIT]
