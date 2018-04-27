@@ -35,7 +35,7 @@ link.on('ready', async () =>
     await knex('OTAADevices').insert({
         // USE YOUR OWN VALUES!
         NwkAddr: nwk_addr,
-        DevEUI: Buffer.from('0004A30B001F0368', 'hex'),
+        DevEUI: Buffer.from('0000000000000000', 'hex'),
         AppKey: Buffer.alloc(16)
     });
 
