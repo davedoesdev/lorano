@@ -124,6 +124,61 @@ grunt example
 npm install lorano
 ----
 
+== Database
+
+In the top-level directory you'll find a file called `lorano.empty.sqlite3`.
+This contains an empty copy of the database `lorano` uses to store information
+about your devices (addresses, keys, activation state etc).
+
+You should use a _copy_ of this file in your application and pass its location
+when setting up http://knexjs.org/[Knex.js]. By default the database is SQLite
+but Knex.js supports many other databases. If you want to use a different
+database, use the lorano link:migrations[] to populate it
+and edit link:knexfile.js[] accordingly. 
+
+=== Seeding device data
+
+You need to add your devices to the database otherwise lorano will ignore
+packets it receives from them.
+
+==== Over-The-Air Activation (OTAA) devices
+
+For each of your devices, you must add a row to the `OTAADevices` table
+containing the following columns:
+
+- `NwkAddr`: Unique network address of the device. This can be random as long
+  as it's unique. It must be a binary value 4 bytes long but only the 25
+  least significant bits are used and the 7 most significant must be 0.
+- `DevEUI`: Unique global device ID in the IEEE EUI64 address space. This must
+  be a binary value 8 bytes long and can usually be quered from the hardware by
+  calling a device API.
+- `AppKey`: The AES-128 key that you've assigned to the device for your
+  application. This is a shared secret between your application and the device
+  and is used to derive session keys specific for the device to encrypt and
+  verify packets communication with it. It must be a binary value 16 bytes long.
+
+An example of seeding the database for an OTAA device using Knex.js can be found
+in link:test/seeds/test_otaa.js[].
+
+==== Activation By Personalization (ABP) devices
+
+For each of your devices, you must add a row to the `ABPDevices` table
+containing the following columns:
+
+- `DevAddr`: The identifier of your network (7 most significant bits) and the
+  unique address of the device wihtin it (25 least significant bits). This must
+  be a binary value 4 bytes long.
+- `NwkSKey`: Network session key for the device. This is a shared secret between
+  your application and the device and is used to calculate and verify the
+  message integrity code of data messages. It must be a binary value 16 bytes
+  long.
+- `AppSKey`: Application session key for the device. This is a shared secret
+  between your application and the device and it used to encrypt and decrypt
+  data messages. It must be a binary value 16 bytes long. 
+
+An example of seeding the database for an ABP device using Knex.js can be found
+in link:test/seeds/test_abp.js[].
+
 == IMST iC880A-SPI reset
 
 If you're using an IMST iC880A-SPI, it needs to be reset after it's powered up.
