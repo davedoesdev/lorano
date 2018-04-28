@@ -1,16 +1,18 @@
 = lorano{nbsp}{nbsp}{nbsp}image:https://circleci.com/gh/davedoesdev/lorano.svg?style=svg[Build Status,link=https://circleci.com/gh/davedoesdev/lorano] image:https://coveralls.io/repos/github/davedoesdev/lorano/badge.svg[Coverage Status,link=https://coveralls.io/github/davedoesdev/lorano] image:https://img.shields.io/npm/v/lorano.svg[NPM version,link=https://www.npmjs.com/package/lorano]
 :prewrap!:
 
-High-level Node.js module for reading and writing LoRa packets.
-It uses streams supplied by https://github.com/davedoesdev/node-lora-comms[node-lora-comms] and https://github.com/anthonykirby/lora-packet[Anthony Kirby's excellent packet decoder].
+High-level Node.js module for reading and writing LoRa packets, with support for
+over-the-air activation (OTAA) of devices.
 
-Tested on a Raspberry Pi 3 Model B with an IMST iC880A-SPI.
+It uses streams supplied by https://github.com/davedoesdev/node-lora-comms[node-lora-comms] and https://github.com/anthonykirby/lora-packet[Anthony Kirby's excellent packet decoder].
 
 Your application is given a single
 https://nodejs.org/dist/latest-v9.x/docs/api/stream.html#stream_class_stream_duplex[Duplex]
 stream operating in object mode for reading and writing packets. Replying to
 a packet typically involves just supplying a payload, though your application
 can override the default transmission settings if required.
+
+Tested on a Raspberry Pi 3 Model B with an IMST iC880A-SPI.
 
 API documentation is available http://rawgit.davedoesdev.com/davedoesdev/lorano/master/docs/index.html[here].
 
@@ -31,7 +33,7 @@ previous packet it sent.
 ----
 const path = require('path');
 const crypto = require('crypto');
-const Link = require('..');
+const { Link } = require('lorano');
 const lora_comms = require('lora-comms');
 const { Model } = require('objection');
 

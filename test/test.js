@@ -2,7 +2,7 @@
 
 // Tested with a SODAQ ExpLoRer running ./lorano_test.ino
 
-const Link = require('..'),
+const { Link } = require('..'),
       lora_comms = require('lora-comms'),
       aw = require('awaitify-stream'),
       lora_packet = require('lora-packet'),

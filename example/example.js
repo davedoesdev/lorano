@@ -1,6 +1,6 @@
 const path = require('path');
 const crypto = require('crypto');
-const Link = require('..');
+const { Link } = require('..');
 const lora_comms = require('lora-comms');
 const { Model } = require('objection');
 

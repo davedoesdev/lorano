@@ -47,7 +47,7 @@ module.exports = function (grunt)
             },
 
             documentation: {
-                cmd: './node_modules/.bin/documentation build -c documentation.yml -f html -o docs lib/lora-comms.js'
+                cmd: './node_modules/.bin/documentation build -c documentation.yml -f html -o docs lib/lorano.js'
             },
 
             serve_documentation: {
