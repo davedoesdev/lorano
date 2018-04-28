@@ -56,18 +56,36 @@
   </div>
   
 
-  <p>Creates a Duplex stream which reads and writes to a LoRa radio link.</p>
+  <p>Creates a Duplex stream (in object mode) which reads and writes to a LoRa radio
+link.</p>
 <p>It can perform over-the-air activation of devices it knows about on behalf
 of your application.</p>
+<p>Messages received from the radio link are made available to read from the
+Duplex and have the following properties:</p>
+<ul>
+<li>nwk_addr</li>
+<li>dev_eui</li>
+<li>dev_addr</li>
+<li>payload</li>
+<li>msg</li>
+<li>packet</li>
+<li>
+reply
+<ul>
+<li>header</li>
+<li>encoding</li>
+</ul>
+</li>
+</ul>
 
 
-  <div class='pre p1 fill-light mt0'>new Link(Model: any, uplink: any, downlink: any, options: any)</div>
+  <div class='pre p1 fill-light mt0'>new Link(Model: class, uplink: <a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>, downlink: <a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
     <p>
       Extends
       
-        Duplex
+        <a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>
       
     </p>
   
@@ -85,33 +103,85 @@ of your application.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>Model</span> <code class='quiet'>(any)</code>
-	    
+            <span class='code bold'>Model</span> <code class='quiet'>(class)</code>
+	    The 
+<a href="https://vincit.github.io/objection.js/#models">Objection.js Model class</a>
+, or a subclass of it, already 
+<a href="https://vincit.github.io/objection.js/#knex">configured for your database using Knex.js</a>
+.
+
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>uplink</span> <code class='quiet'>(any)</code>
-	    
+            <span class='code bold'>uplink</span> <code class='quiet'>(<a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>)</code>
+	    <a href="https://rawgit-gjgjyaqiln.now.sh/davedoesdev/node-lora-comms/master/docs/index.html#lora-commsuplink">lora-comms uplink stream</a>
+. Your application must 
+<a href="https://rawgit-gjgjyaqiln.now.sh/davedoesdev/node-lora-comms/master/docs/index.html#lora-commsstart">start</a>
+ the 
+<a href="https://github.com/davedoesdev/node-lora-comms">lora-comms</a>
+ module first and then retrieve the uplink.
+
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>downlink</span> <code class='quiet'>(any)</code>
-	    
+            <span class='code bold'>downlink</span> <code class='quiet'>(<a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>)</code>
+	    <a href="https://rawgit-gjgjyaqiln.now.sh/davedoesdev/node-lora-comms/master/docs/index.html#lora-commsdownlink">lora-comms downlink stream</a>
+. Your application must 
+<a href="https://rawgit-gjgjyaqiln.now.sh/davedoesdev/node-lora-comms/master/docs/index.html#lora-commsstart">start</a>
+ the 
+<a href="https://github.com/davedoesdev/node-lora-comms">lora-comms</a>
+ module first and then retrieve the downlink.
+
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>options</span> <code class='quiet'>(any)</code>
-	    
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    Configuration options.
+
           </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>options.appid</span> <code class='quiet'><a href="https://nodejs.org/api/buffer.html">Buffer</a></code>
+  </td>
+  <td class='break-word'><span>8-byte identifier of your application in the IEEE EUI64 address space. This is also known as the AppEUI and your OTAA devices must use the same value.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>options.netid</span> <code class='quiet'><a href="https://nodejs.org/api/buffer.html">Buffer</a></code>
+  </td>
+  <td class='break-word'><span>3-byte identifier of your network. The 7 least significant bits must be unique for neighbouring or overlapping networks.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
           
         </div>
       

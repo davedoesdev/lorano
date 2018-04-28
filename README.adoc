@@ -166,7 +166,7 @@ For each of your devices, you must add a row to the `ABPDevices` table
 containing the following columns:
 
 - `DevAddr`: The identifier of your network (7 most significant bits) and the
-  unique address of the device wihtin it (25 least significant bits). This must
+  unique address of the device within it (25 least significant bits). This must
   be a binary value 4 bytes long.
 - `NwkSKey`: Network session key for the device. This is a shared secret between
   your application and the device and is used to calculate and verify the
