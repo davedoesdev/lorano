@@ -26,10 +26,40 @@
                 
                 <li><a
                   href='#link'
-                  class="">
+                  class=" toggle-sibling">
                   Link
-                  
+                  <span class='icon'>▸</span>
                 </a>
+                
+                <div class='toggle-target display-none'>
+                  
+                  
+                    <ul class='list-reset py1-ul pl1'>
+                      <li class='h5'><span>Instance members</span></li>
+                      
+                      <li><a
+                        href='#linknwk_addr_to_dev_addr'
+                        class='regular pre-open'>
+                        #nwk_addr_to_dev_addr
+                      </a></li>
+                      
+                      <li><a
+                        href='#linkdev_addr_to_nwk_addr'
+                        class='regular pre-open'>
+                        #dev_addr_to_nwk_addr
+                      </a></li>
+                      
+                      <li><a
+                        href='#linkdev_addr_to_deveui'
+                        class='regular pre-open'>
+                        #dev_addr_to_deveui
+                      </a></li>
+                      
+                    </ul>
+                  
+                  
+                  
+                </div>
                 
                 </li>
               
@@ -200,6 +230,230 @@ the data that should be sent and then write <code>reply</code> to the Duplex.</p
   
 
   
+
+  
+    <div class='py1 quiet mt1 prose-big'>Instance Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='linknwk_addr_to_dev_addr'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>nwk_addr_to_dev_addr(nwk_addr)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Combines the unique address of a device with the network identifier
+configured for this <a href="#link">link</a> (<code>options.netid</code>).</p>
+
+
+  <div class='pre p1 fill-light mt0'>nwk_addr_to_dev_addr(nwk_addr: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): <a href="https://nodejs.org/api/buffer.html">Buffer</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>nwk_addr</span> <code class='quiet'>(<a href="https://nodejs.org/api/buffer.html">Buffer</a>)</code>
+	    Device address within the network.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://nodejs.org/api/buffer.html">Buffer</a></code>:
+        25 lsb: 
+<code>nwk_addr</code>
+; 7 msb: the 7 lsb of 
+<code>options.netid</code>
+.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='linkdev_addr_to_nwk_addr'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>dev_addr_to_nwk_addr(dev_addr)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Checks if the supplied device address is on the network configured
+for this <a href="#link">link</a> (<code>options.netid</code>).</p>
+
+
+  <div class='pre p1 fill-light mt0'>dev_addr_to_nwk_addr(dev_addr: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): (<a href="https://nodejs.org/api/buffer.html">Buffer</a> | null)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>dev_addr</span> <code class='quiet'>(<a href="https://nodejs.org/api/buffer.html">Buffer</a>)</code>
+	    Combined device and network address.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>(<a href="https://nodejs.org/api/buffer.html">Buffer</a> | null)</code>:
+        If the device is on the configured network then the 25 lsb of 
+<code>dev_addr</code>
+ otherwise 
+<code>null</code>
+.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='linkdev_addr_to_deveui'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>dev_addr_to_deveui(dev_addr)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>If the supplied device address is on the network configured
+for this <a href="#link">link</a> (<code>options.netid</code>) then return its unique
+global device ID (IEEE EUI64).</p>
+
+
+  <div class='pre p1 fill-light mt0'>dev_addr_to_deveui(dev_addr: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): (<a href="https://nodejs.org/api/buffer.html">Buffer</a> | null)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>dev_addr</span> <code class='quiet'>(<a href="https://nodejs.org/api/buffer.html">Buffer</a>)</code>
+	    Combined device and network address.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>(<a href="https://nodejs.org/api/buffer.html">Buffer</a> | null)</code>:
+        If the device is on the configured network then its IEEE EUI64 ID otherwise 
+<code>null</code>
+.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
 
   
 
