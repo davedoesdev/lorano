@@ -49,5 +49,9 @@
     "yargs": "^11.0.0",
     "sqlite3": "^4.0.0",
     "lora-comms": "~0.0.8"
+  },
+  "scripts": {
+    "test": "grunt lint test",
+    "ci": "grunt lint coverage coveralls"
   }
 }
