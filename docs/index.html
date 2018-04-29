@@ -63,20 +63,23 @@ of your application.</p>
 <p>Messages received from the radio link are made available to read from the
 Duplex and have the following properties:</p>
 <ul>
-<li>nwk_addr</li>
-<li>dev_eui</li>
-<li>dev_addr</li>
-<li>payload</li>
-<li>msg</li>
-<li>packet</li>
+<li><code>nwk_addr (Buffer)</code> - Unique network address of the sending device.</li>
+<li><code>dev_eui (Buffer)</code> - Unique global device identifier (IEEE EUI64) of the sending device.</li>
+<li><code>dev_addr (Buffer)</code> - Combined identifier of your network (7 most significant bits) and the unique network address of the sending device (i.e. <code>nwk_addr</code>, 25 least significant bits).</li>
+<li><code>payload (Buffer)</code> - The data which the sending device sent to your application.</li>
+<li><code>msg (Object)</code> - The raw packet received by <a href="https://github.com/davedoesdev/packet_forwarder_shared">packet_forwarder_shared</a>. The format is described <a href="https://github.com/davedoesdev/packet_forwarder_shared/blob/master/PROTOCOL.TXT">here</a>.</li>
+<li><code>packet (Object)</code> - The decoded packet. Anthony Kirby's excellent <a href="https://github.com/anthonykirby/lora-packet">lora-packet</a> is used to do the decoding.</li>
 <li>
-reply
+<code>reply (Object)</code> - This contains nearly everything needed to reply to the message. Your application just has to set the payload.
 <ul>
-<li>header</li>
-<li>encoding</li>
+<li><code>header (Object)</code> - The metadata required by <a href="https://github.com/davedoesdev/packet_forwarder_shared">packet_forwarder_shared</a> to send the reply. See section 6 of <a href="https://github.com/davedoesdev/packet_forwarder_shared/blob/master/PROTOCOL.TXT">here</a>.</li>
+<li><code>encoding (Object)</code> - The fields required by <a href="https://github.com/anthonykirby/lora-packet#fromfieldsdata">lora-packet</a> to encode the reply.</li>
+<li><code>payload (undefined)</code> - Your application must set this property to a Buffer containing the data you want to send back to the device.</li>
 </ul>
 </li>
 </ul>
+<p>If your application wants to reply to the message, set <code>reply.payload</code> to
+the data that should be sent and then write <code>reply</code> to the Duplex.</p>
 
 
   <div class='pre p1 fill-light mt0'>new Link(Model: class, uplink: <a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>, downlink: <a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>

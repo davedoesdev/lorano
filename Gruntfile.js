@@ -47,11 +47,7 @@ module.exports = function (grunt)
             },
 
             documentation: {
-                cmd: "./node_modules/.bin/documentation build -c documentation.yml -f html -o docs lib/lorano.js && sed -i 's/<p>reply<\\/p>/reply/' docs/index.html"
-            },
-
-            serve_documentation: {
-                cmd: './node_modules/.bin/documentation serve -w -c documentation.yml lib/lora-comms.js'
+                cmd: "./node_modules/.bin/documentation build -c documentation.yml -f html -o docs lib/lorano.js && sed -i 's/<p>\\(<code>reply.*\\)<\\/p>/\\1/' docs/index.html"
             }
         },
 
@@ -84,7 +80,6 @@ module.exports = function (grunt)
                                    'run_example']);
     grunt.registerTask('coveralls', 'exec:coveralls');
     grunt.registerTask('docs', 'exec:documentation');
-    grunt.registerTask('serve_docs', 'exec:serve_documentation');
     grunt.registerTask('default', ['lint', 'test']);
 
     grunt.registerTask('run_example', 'run example', function ()
