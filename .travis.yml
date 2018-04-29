@@ -12,6 +12,7 @@ addons:
       - g++-6
 env:
   global:
+    - CC=gcc-6
     - CXX=g++-6
 script:
   - npm run ci
