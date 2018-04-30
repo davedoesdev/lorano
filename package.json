@@ -1,7 +1,7 @@
 {
   "name": "lorano",
   "description": "Compact and opinionated LoRa communications library",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/davedoesdev/lorano",
   "author": {
     "name": "David Halls",
@@ -30,7 +30,6 @@
   ],
   "dependencies": {
     "awaitify-stream": "^1.0.1",
-    "knex": "^0.14.4",
     "lora-packet": "^0.7.5",
     "objection": "^1.0.1"
   },
@@ -48,7 +47,8 @@
     "coveralls": "~3.0.0",
     "yargs": "^11.0.0",
     "sqlite3": "^4.0.0",
-    "lora-comms": "~0.0.8"
+    "lora-comms": "~0.0.8",
+    "knex": "^0.14.4"
   },
   "scripts": {
     "test": "grunt lint test",
