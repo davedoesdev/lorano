@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:9.11.1
+      - image: circleci/node:10.0.0
         environment:
           CC: gcc-6
           CXX: g++-6
