@@ -7,9 +7,7 @@ jobs:
       - checkout
       - run:
           name: install
-          command: |
-            sudo apt -y install lcov
-            npm install
+          command: npm install
       - run:
           name: test
           command: npm run ci
