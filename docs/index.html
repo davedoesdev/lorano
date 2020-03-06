@@ -1,20 +1,21 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset='utf-8' />
-  <title>lorano 0.0.1 | Documentation</title>
+  <meta charset='utf-8'>
+  <title>lorano 0.0.4 | Documentation</title>
+  <meta name='description' content='Compact and opinionated LoRa communications library'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
-  <link href='assets/bass.css' type='text/css' rel='stylesheet' />
-  <link href='assets/style.css' type='text/css' rel='stylesheet' />
-  <link href='assets/github.css' type='text/css' rel='stylesheet' />
-  <link href='assets/split.css' type='text/css' rel='stylesheet' />
+  <link href='assets/bass.css' rel='stylesheet'>
+  <link href='assets/style.css' rel='stylesheet'>
+  <link href='assets/github.css' rel='stylesheet'>
+  <link href='assets/split.css' rel='stylesheet'>
 </head>
 <body class='documentation m0'>
     <div class='flex'>
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lorano</h3>
-          <div class='mb1'><code>0.0.1</code></div>
+          <div class='mb1'><code>0.0.4</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -66,14 +67,14 @@
             </ul>
           </div>
           <div class='mt1 h6 quiet'>
-            <a href='http://documentation.js.org/reading-documentation.html'>Need help reading this?</a>
+            <a href='https://documentation.js.org/reading-documentation.html'>Need help reading this?</a>
           </div>
         </div>
       </div>
       <div id='split-right' class='relative overflow-auto height-viewport-100'>
         
           
-            <section class='p2 mb2 clearfix bg-white minishadow'>
+          <section class='p2 mb2 clearfix bg-white minishadow'>
 
   
   <div class='clearfix'>
@@ -111,8 +112,7 @@ Duplex and have the following properties:</p>
 <p>If your application wants to reply to the message, set <code>reply.payload</code> to
 the data that should be sent and then write <code>reply</code> to the Duplex.</p>
 
-
-  <div class='pre p1 fill-light mt0'>new Link(Model: class, uplink: <a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>, downlink: <a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+    <div class='pre p1 fill-light mt0'>new Link(Model: class, uplink: <a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>, downlink: <a href="https://nodejs.org/api/stream.html#stream_class_stream_duplex_1">stream.Duplex</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
     <p>
@@ -250,8 +250,7 @@ the data that should be sent and then write <code>reply</code> to the Duplex.</p
   <p>Combines the unique address of a device with the network identifier
 configured for this <a href="#link">link</a> (<code>options.netid</code>).</p>
 
-
-  <div class='pre p1 fill-light mt0'>nwk_addr_to_dev_addr(nwk_addr: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): <a href="https://nodejs.org/api/buffer.html">Buffer</a></div>
+    <div class='pre p1 fill-light mt0'>nwk_addr_to_dev_addr(nwk_addr: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): <a href="https://nodejs.org/api/buffer.html">Buffer</a></div>
   
   
 
@@ -303,6 +302,8 @@ configured for this <a href="#link">link</a> (<code>options.netid</code>).</p>
   
 
   
+
+  
 </section>
 
       </div>
@@ -323,8 +324,7 @@ configured for this <a href="#link">link</a> (<code>options.netid</code>).</p>
   <p>Checks if the supplied device address is on the network configured
 for this <a href="#link">link</a> (<code>options.netid</code>).</p>
 
-
-  <div class='pre p1 fill-light mt0'>dev_addr_to_nwk_addr(dev_addr: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): (<a href="https://nodejs.org/api/buffer.html">Buffer</a> | null)</div>
+    <div class='pre p1 fill-light mt0'>dev_addr_to_nwk_addr(dev_addr: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): (<a href="https://nodejs.org/api/buffer.html">Buffer</a> | null)</div>
   
   
 
@@ -376,6 +376,8 @@ for this <a href="#link">link</a> (<code>options.netid</code>).</p>
   
 
   
+
+  
 </section>
 
       </div>
@@ -397,8 +399,7 @@ for this <a href="#link">link</a> (<code>options.netid</code>).</p>
 for this <a href="#link">link</a> (<code>options.netid</code>) then return its unique
 global device ID (IEEE EUI64).</p>
 
-
-  <div class='pre p1 fill-light mt0'>dev_addr_to_deveui(dev_addr: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): (<a href="https://nodejs.org/api/buffer.html">Buffer</a> | null)</div>
+    <div class='pre p1 fill-light mt0'>dev_addr_to_deveui(dev_addr: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): (<a href="https://nodejs.org/api/buffer.html">Buffer</a> | null)</div>
   
   
 
@@ -448,12 +449,16 @@ global device ID (IEEE EUI64).</p>
   
 
   
+
+  
 </section>
 
       </div>
     </div>
   
 </div>
+
+  
 
   
 

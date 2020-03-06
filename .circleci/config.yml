@@ -2,18 +2,13 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:10.0.0
-        environment:
-          CC: gcc-6
-          CXX: g++-6
+      - image: circleci/node:13.10.1-buster
     steps:
       - checkout
       - run:
           name: install
           command: |
-            sudo bash -c 'echo "deb http://ftp.us.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
-            sudo apt-get -y update
-            sudo apt-get -y install -t unstable g++-6 lcov
+            sudo apt -y install lcov
             npm install
       - run:
           name: test
