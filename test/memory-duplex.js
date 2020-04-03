@@ -5,10 +5,6 @@ function RightDuplex(left, options)
 {
     Duplex.call(this, options);
     this.left = left;
-    this.on('finish', function ()
-    {
-        left.push(null);
-    });
     this._orig_emit = this.emit;
     this.emit = function (type)
     {
@@ -26,6 +22,12 @@ function RightDuplex(left, options)
 }
 
 util.inherits(RightDuplex, Duplex);
+
+RightDuplex.prototype._final = function (cb)
+{
+    this.left.push(null);
+    cb();
+};
 
 RightDuplex.prototype._read = function ()
 {
@@ -53,10 +55,6 @@ function LeftDuplex(options)
 {
     Duplex.call(this, options);
     this.right = new RightDuplex(this, options);
-    this.on('finish', function ()
-    {
-        this.right.push(null);
-    });
     this._orig_emit = this.emit;
     this.emit = function (type)
     {
@@ -75,6 +73,11 @@ function LeftDuplex(options)
 }
 
 util.inherits(LeftDuplex, Duplex);
+
+LeftDuplex.prototype._final = function (cb)
+{
+    this.right.push(null);
+};
 
 LeftDuplex.prototype._read = function ()
 {
