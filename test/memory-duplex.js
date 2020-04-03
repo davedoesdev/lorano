@@ -77,6 +77,7 @@ util.inherits(LeftDuplex, Duplex);
 LeftDuplex.prototype._final = function (cb)
 {
     this.right.push(null);
+    cb();
 };
 
 LeftDuplex.prototype._read = function ()
