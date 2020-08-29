@@ -9,6 +9,8 @@ for (const arg of process.argv)
     }
 }
 
+const test_cmd = `./node_modules/.bin/mocha --timeout 30000 --bail -- ${args}`;
+
 module.exports = function (grunt)
 {
     grunt.initConfig(
@@ -22,21 +24,19 @@ module.exports = function (grunt)
             ]
         },
 
-        mochaTest: {
-            src: 'test/test.js',
-            options: {
-                timeout: 30 * 1000
-            }
-        },
-
         exec: {
             seed: {
                 cwd: './test',
-                cmd: '../node_modules/.bin/knex seed:run --' + args
+                cmd: `../node_modules/.bin/knex seed:run -- ${args}`
+            },
+
+            test: {
+                cmd: test_cmd,
+                stdio: 'inherit'
             },
 
             cover: {
-                cmd: "./node_modules/.bin/nyc -x Gruntfile.js -x knexfile.js -x 'test/**' node ./node_modules/.bin/grunt test" + args
+                cmd: `./node_modules/.bin/nyc -x knexfile.js -x 'test/**' ${test_cmd}`
             },
 
             cover_report: {
@@ -70,14 +70,13 @@ module.exports = function (grunt)
     });
 
     grunt.loadNpmTasks('grunt-eslint');
-    grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-exec');
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('lint', 'eslint');
     grunt.registerTask('test', ['copy:test_db',
                                 'exec:seed',
-                                'mochaTest']);
+                                'exec:test']);
     grunt.registerTask('coverage', ['exec:cover',
                                     'exec:cover_report',
                                     'exec:cover_check']);
