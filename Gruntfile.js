@@ -9,7 +9,7 @@ for (const arg of process.argv)
     }
 }
 
-const test_cmd = `./node_modules/.bin/mocha --timeout 30000 --bail -- ${args}`;
+const test_cmd = `./node_modules/.bin/mocha --timeout 30000 --bail ${args}`;
 
 module.exports = function (grunt)
 {
@@ -53,6 +53,11 @@ module.exports = function (grunt)
 
             documentation: {
                 cmd: "./node_modules/.bin/documentation build -c documentation.yml -f html -o docs lib/lorano.js && sed -i 's/<p>\\(<code>reply.*\\)<\\/p>/\\1/' docs/index.html"
+            },
+
+            run_example: {
+                cmd: 'node example/example.js',
+                stdio: 'inherit'
             }
         },
 
@@ -77,19 +82,15 @@ module.exports = function (grunt)
     grunt.registerTask('test', ['copy:test_db',
                                 'exec:seed',
                                 'exec:test']);
-    grunt.registerTask('coverage', ['exec:cover',
+    grunt.registerTask('coverage', ['copy:test_db',
+                                    'exec:seed',
+                                    'exec:cover',
                                     'exec:cover_report',
                                     'exec:cover_check']);
     grunt.registerTask('example', ['copy:example_db',
-                                   'run_example']);
+                                   'exec:run_example']);
     grunt.registerTask('coveralls', 'exec:coveralls');
     grunt.registerTask('docs', 'exec:documentation');
     grunt.registerTask('default', ['lint', 'test']);
-
-    grunt.registerTask('run_example', 'run example', function ()
-    {
-        require('lora-comms').on('stop', this.async());
-        require('./example/example');
-    });
 };
 

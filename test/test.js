@@ -48,6 +48,11 @@ before(function ()
     TestModel.knex(knex);
 });
 
+after(function ()
+{
+    TestModel.knex().destroy();
+});
+
 function start_simulate(options, cb)
 {
     uplink = new LeftDuplex();

@@ -53,6 +53,7 @@ const knex = require('knex')({
     }
 });
 Model.knex(knex);
+lora_comms.on('stop', () => knex.destroy());
 
 const link = new Link(Model, lora_comms.uplink, lora_comms.downlink, {
     // USE YOUR OWN IDS!
@@ -191,6 +192,7 @@ to perform the reset:
 [source,sh]
 .iC880A-SPI_reset.sh
 ----
+#!/bin/sh
 echo "25" > /sys/class/gpio/export
 echo "out" > /sys/class/gpio/gpio25/direction
 echo "1" > /sys/class/gpio/gpio25/value
@@ -198,6 +200,7 @@ sleep 5
 echo "0" > /sys/class/gpio/gpio25/value
 sleep 1
 echo "0" > /sys/class/gpio/gpio25/value
+chmod o+rw /dev/spidev0.0
 ----
 
 == Test

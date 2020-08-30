@@ -20,6 +20,7 @@ const knex = require('knex')({
     }
 });
 Model.knex(knex);
+lora_comms.on('stop', () => knex.destroy());
 
 const link = new Link(Model, lora_comms.uplink, lora_comms.downlink, {
     // USE YOUR OWN IDS!
