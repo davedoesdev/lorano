@@ -46,7 +46,7 @@
     "coveralls": "^3.1.0",
     "yargs": "^15.4.1",
     "sqlite3": "^5.0.0",
-    "lora-comms": "^0.0.16",
+    "lora-comms": "^0.0.17",
     "knex": "^0.21.5"
   },
   "scripts": {

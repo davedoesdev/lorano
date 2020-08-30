@@ -240,8 +240,11 @@ Or with a LoRa device running link:test/lorano_test.ino[]:
 
 [source,bash]
 ----
-grunt test --deveui=XXXXXXXXXXXXXXXX
+grunt coverage --deveui=XXXXXXXXXXXXXXXX
 ----
+
+https://istanbul.js.org/[Istanbul] results are available
+http://rawgit.davedoesdev.com/davedoesdev/lorano/master/coverage/lcov-report/index.html[here].
 
 == Licence
 
