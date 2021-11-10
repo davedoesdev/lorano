@@ -243,7 +243,7 @@ Or with a LoRa device running link:test/lorano_test.ino[]:
 grunt coverage --deveui=XXXXXXXXXXXXXXXX
 ----
 
-https://istanbul.js.org/[Istanbul] results are available
+https://github.com/bcoe/c8[c8] results are available
 http://rawgit.davedoesdev.com/davedoesdev/lorano/master/coverage/lcov-report/index.html[here].
 
 == Licence

@@ -252,7 +252,7 @@ Or with a LoRa device running
 grunt coverage --deveui=XXXXXXXXXXXXXXXX
 ```
 
-[Istanbul](https://istanbul.js.org/) results are available
+[c8](https://github.com/bcoe/c8) results are available
 [here](http://rawgit.davedoesdev.com/davedoesdev/lorano/master/coverage/lcov-report/index.html).
 
 # Licence
