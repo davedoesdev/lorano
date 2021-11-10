@@ -13,7 +13,7 @@ specifiers:
   grunt-eslint: ^24.0.0
   grunt-exec: ^3.0.0
   knex: ^0.95.14
-  lora-comms: ^0.0.18
+  lora-comms: ^0.0.19
   lora-packet: ^0.8.12
   mocha: ^9.1.3
   objection: ^3.0.0
@@ -34,7 +34,7 @@ devDependencies:
   grunt-eslint: 24.0.0_grunt@1.4.1
   grunt-exec: 3.0.0_grunt@1.4.1
   knex: 0.95.14_sqlite3@5.0.2
-  lora-comms: 0.0.18
+  lora-comms: 0.0.19
   mocha: 9.1.3
   sqlite3: 5.0.2
   yargs: 17.2.1
@@ -2698,8 +2698,8 @@ packages:
     resolution: {integrity: sha512-cHlYSUpL2s7Fb3394mYxwTYj8niTaNHUCLr0qdiCXQfSjfuA7CKofpX2uSwEfFDQ0EB7JcnMnm+GjbqqoinYYg==}
     dev: true
 
-  /lora-comms/0.0.18:
-    resolution: {integrity: sha512-WY8iO6Ke+fa86v/sCk7iWrjY1XKyePlPLQ+/kXDT9HtMRemkk8N/Gq3yddM94XXUEEhvEX+ub/EV/RO0G4CHWw==}
+  /lora-comms/0.0.19:
+    resolution: {integrity: sha512-NCe2uo7FvUEQy2jpqzzU1H5rZyp0sxsQIOp1rWGoEcjMD69JJrqnRJb5O9XN7B7qIoQQTjG7UBwm4yo1qh6Y9Q==}
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
