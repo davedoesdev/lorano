@@ -315,7 +315,7 @@ function start_simulate(options, cb)
             expect(pull_resp[0]).to.equal(PROTOCOL_VERSION);
             expect(pull_resp[3]).to.equal(pkts.PULL_RESP);
 
-            let decoded = lora_packet.fromWire(Buffer.from(
+            const decoded = lora_packet.fromWire(Buffer.from(
                     JSON.parse(pull_resp.slice(4)).txpk.data, 'base64'));
             expect(decoded.getMType()).to.equal('Unconfirmed Data Down');
 
@@ -362,7 +362,7 @@ function stop_simulate(cb)
     uplink.end();
     downlink.end();
     downlink.right.end();
-    return cb();
+    cb();
 }
 
 function start(cb)

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lorano 0.0.4 | Documentation</title>
+  <title>lorano 0.0.6 | Documentation</title>
   <meta name='description' content='Compact and opinionated LoRa communications library'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,11 +15,14 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lorano</h3>
-          <div class='mb1'><code>0.0.4</code></div>
+          <div class='mb1'><code>0.0.6</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
             class='col12 block input'
+            spellcheck='false'
+            autocapitalize='off'
+            autocorrect='off'
             type='text' />
           <div id='toc'>
             <ul class='list-reset h5 py1-ul'>
@@ -100,8 +103,7 @@ Duplex and have the following properties:</p>
 <li><code>payload (Buffer)</code> - The data which the sending device sent to your application.</li>
 <li><code>msg (Object)</code> - The raw packet received by <a href="https://github.com/davedoesdev/packet_forwarder_shared">packet_forwarder_shared</a>. The format is described <a href="https://github.com/davedoesdev/packet_forwarder_shared/blob/master/PROTOCOL.TXT">here</a>.</li>
 <li><code>packet (Object)</code> - The decoded packet. Anthony Kirby's excellent <a href="https://github.com/anthonykirby/lora-packet">lora-packet</a> is used to do the decoding.</li>
-<li>
-<code>reply (Object)</code> - This contains nearly everything needed to reply to the message. Your application just has to set the payload.
+<li><code>reply (Object)</code> - This contains nearly everything needed to reply to the message. Your application just has to set the payload.
 <ul>
 <li><code>header (Object)</code> - The metadata required by <a href="https://github.com/davedoesdev/packet_forwarder_shared">packet_forwarder_shared</a> to send the reply. See section 6 of <a href="https://github.com/davedoesdev/packet_forwarder_shared/blob/master/PROTOCOL.TXT">here</a>.</li>
 <li><code>encoding (Object)</code> - The fields required by <a href="https://github.com/anthonykirby/lora-packet#fromfieldsdata">lora-packet</a> to encode the reply.</li>
@@ -232,6 +234,8 @@ the data that should be sent and then write <code>reply</code> to the Duplex.</p
   
 
   
+
+  
     <div class='py1 quiet mt1 prose-big'>Instance Members</div>
     <div class="clearfix">
   
@@ -291,6 +295,8 @@ configured for this <a href="#link">link</a> (<code>options.netid</code>).</p>
 
       
     
+  
+
   
 
   
@@ -378,6 +384,8 @@ for this <a href="#link">link</a> (<code>options.netid</code>).</p>
   
 
   
+
+  
 </section>
 
       </div>
@@ -438,6 +446,8 @@ global device ID (IEEE EUI64).</p>
 
       
     
+  
+
   
 
   

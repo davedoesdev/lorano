@@ -1,4 +1,4 @@
 /node_modules
 /test/lorano.sqlite3
 /example/lorano.sqlite3
-/.nyc_output
+/coverage/tmp

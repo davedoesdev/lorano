@@ -1,15 +1,10 @@
 "use strict";
 
-let args = '';
-for (const arg of process.argv)
-{
-    if (arg.startsWith('--'))
-    {
-        args += ' ' + arg;
-    }
-}
-
+const args = process.argv.filter(a => a.startsWith('--')).map(a => ` ${a}`);
+// note we can't use npx mocha because npx initialises the thread pool
+// before we can set UV_THREADPOOL_SIZE in lib/lora-comms.js
 const test_cmd = `./node_modules/.bin/mocha --timeout 30000 --bail ${args}`;
+const c8 = "npx c8 -x Gruntfile.js -x knexfile.js -x 'test/**'";
 
 module.exports = function (grunt)
 {
@@ -24,42 +19,36 @@ module.exports = function (grunt)
             ]
         },
 
-        exec: {
+        exec: Object.fromEntries(Object.entries({
             seed: {
                 cwd: './test',
                 cmd: `../node_modules/.bin/knex seed:run -- ${args}`
             },
 
             test: {
-                cmd: test_cmd,
-                stdio: 'inherit'
+                cmd: test_cmd
             },
 
             cover: {
-                cmd: `./node_modules/.bin/nyc -x knexfile.js -x 'test/**' ${test_cmd}`
+                cmd: `${c8} ${test_cmd}`
             },
 
             cover_report: {
-                cmd: './node_modules/.bin/nyc report -r lcov'
+                cmd: `${c8} report -r lcov`
             },
 
             cover_check: {
-                cmd: './node_modules/.bin/nyc check-coverage --statements 100 --brances 100 --functions 100 --lines 100'
-            },
-
-            coveralls: {
-                cmd: 'cat coverage/lcov.info | ./node_modules/.bin/coveralls'
+                cmd: `${c8} check-coverage --statements 100 --branches 100 --functions 100 --lines 100`
             },
 
             documentation: {
-                cmd: "./node_modules/.bin/documentation build -c documentation.yml -f html -o docs lib/lorano.js && sed -i 's/<p>\\(<code>reply.*\\)<\\/p>/\\1/' docs/index.html"
+                cmd: 'npx documentation build -c documentation.yml -f html -o docs lib/lorano.js'
             },
 
             run_example: {
-                cmd: 'node example/example.js',
-                stdio: 'inherit'
+                cmd: 'node example/example.js'
             }
-        },
+        }).map(([k, v]) => [k, { stdio: 'inherit', ...v }])),
 
         copy: {
             test_db: {
@@ -89,7 +78,6 @@ module.exports = function (grunt)
                                     'exec:cover_check']);
     grunt.registerTask('example', ['copy:example_db',
                                    'exec:run_example']);
-    grunt.registerTask('coveralls', 'exec:coveralls');
     grunt.registerTask('docs', 'exec:documentation');
     grunt.registerTask('default', ['lint', 'test']);
 };
