@@ -1,4 +1,4 @@
-= lorano{nbsp}{nbsp}{nbsp}image:https://circleci.com/gh/davedoesdev/lorano.svg?style=svg[Build Status,link=https://circleci.com/gh/davedoesdev/lorano] image:https://coveralls.io/repos/github/davedoesdev/lorano/badge.svg[Coverage Status,link=https://coveralls.io/github/davedoesdev/lorano] image:https://img.shields.io/npm/v/lorano.svg[NPM version,link=https://www.npmjs.com/package/lorano]
+= lorano{nbsp}{nbsp}{nbsp}image:https://github.com/davedoesdev/lorano/actions/workflows/ci.yml/badge.svg[Build Status,link=https://github.com/davedoesdev/lorano/actions/workflows/ci.yml] image:https://coveralls.io/repos/github/davedoesdev/lorano/badge.svg[Coverage Status,link=https://coveralls.io/github/davedoesdev/lorano] image:https://img.shields.io/npm/v/lorano.svg[NPM version,link=https://www.npmjs.com/package/lorano]
 :prewrap!:
 
 High-level Node.js module for reading and writing LoRa packets, with support for
