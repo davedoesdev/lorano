@@ -1,7 +1,7 @@
 {
   "name": "lorano",
   "description": "Compact and opinionated LoRa communications library",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "homepage": "https://github.com/davedoesdev/lorano",
   "author": {
     "name": "David Halls",
@@ -30,22 +30,22 @@
   ],
   "dependencies": {
     "awaitify-stream": "^1.0.2",
-    "lora-packet": "^0.8.12",
-    "objection": "^3.0.0"
+    "lora-packet": "^0.8.15",
+    "objection": "^3.0.1"
   },
   "devDependencies": {
-    "c8": "^7.10.0",
-    "chai": "^4.3.4",
+    "c8": "^7.11.3",
+    "chai": "^4.3.6",
     "documentation": "documentationjs/documentation",
-    "grunt": "^1.4.1",
+    "grunt": "^1.5.3",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-eslint": "^24.0.0",
     "grunt-exec": "^3.0.0",
-    "knex": "^0.95.14",
-    "lora-comms": "^0.0.19",
-    "mocha": "^9.1.3",
-    "sqlite3": "npm:@vscode/sqlite3@^5.0.7",
-    "yargs": "^17.2.1"
+    "knex": "^2.1.0",
+    "lora-comms": "^1.0.0",
+    "mocha": "^10.0.0",
+    "sqlite3": "npm:@vscode/sqlite3@^5.0.8",
+    "yargs": "^17.5.1"
   },
   "scripts": {
     "test": "grunt lint test"
