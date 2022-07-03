@@ -1,7 +1,7 @@
 {
   "name": "lorano",
   "description": "Compact and opinionated LoRa communications library",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/davedoesdev/lorano",
   "author": {
     "name": "David Halls",
@@ -44,7 +44,7 @@
     "knex": "^2.1.0",
     "lora-comms": "^1.0.0",
     "mocha": "^10.0.0",
-    "sqlite3": "npm:@vscode/sqlite3@^5.0.8",
+    "sqlite3": "^5.0.8",
     "yargs": "^17.5.1"
   },
   "scripts": {
